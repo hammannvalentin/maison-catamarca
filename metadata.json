@@ -1,0 +1,6 @@
+{
+  "name": "Maison Cherry - Concept Store Catamarca",
+  "description": "Tienda online oficial de Maison Cherry Catamarca. Combos exclusivos de accesorios y joyería con confirmación inmediata por WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
