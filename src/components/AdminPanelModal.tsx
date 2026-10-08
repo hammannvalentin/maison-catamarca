@@ -14,9 +14,13 @@ import {
   Sparkles,
   Eye,
   Upload,
+  Copy,
+  Download,
+  Loader2,
+  HardDriveDownload,
 } from 'lucide-react';
 import { Product } from '../types';
-import { PRODUCTS as DEFAULT_PRODUCTS } from '../data/products';
+import { PRODUCTS as DEFAULT_PRODUCTS, DEFAULT_HERO_IMAGE } from '../data/products';
 
 interface AdminPanelModalProps {
   isOpen: boolean;
@@ -61,6 +65,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [tempInstagram, setTempInstagram] = useState<string>(instagramHandle);
   const [newImageUrl, setNewImageUrl] = useState<string>('');
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSavingToCode, setIsSavingToCode] = useState(false);
+  const [codeSaveMessage, setCodeSaveMessage] = useState<string | null>(null);
+  const [copiedSuccess, setCopiedSuccess] = useState(false);
 
   // Sync state when modal opens
   React.useEffect(() => {
@@ -71,6 +78,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       setTempWhatsapp(whatsappNumber);
       setTempInstagram(instagramHandle);
       setSavedSuccess(false);
+      setCodeSaveMessage(null);
     }
   }, [isOpen, products, heroImage, discountAmount, whatsappNumber, instagramHandle]);
 
@@ -182,19 +190,95 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const handleSaveAll = () => {
+  const handleSaveToCode = async () => {
+    setIsSavingToCode(true);
+    setCodeSaveMessage(null);
+
+    // 1. Guardar en estado de React y en almacenamiento local
     onUpdateProducts(editableProducts);
     onUpdateHeroImage(tempHeroImage);
     onUpdateDiscount(tempDiscount);
     onUpdateWhatsapp(tempWhatsapp);
     onUpdateInstagram(tempInstagram);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+
+    // 2. Grabar permanentemente en los archivos del proyecto (src/data/products.ts y public/images/)
+    try {
+      const res = await fetch('/api/save-defaults', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          products: editableProducts,
+          heroImage: tempHeroImage,
+          discountAmount: tempDiscount,
+          whatsappNumber: tempWhatsapp,
+          instagramHandle: tempInstagram,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.products) {
+          setEditableProducts(data.products);
+          onUpdateProducts(data.products);
+        }
+        if (data.heroImage) {
+          setTempHeroImage(data.heroImage);
+          onUpdateHeroImage(data.heroImage);
+        }
+        setCodeSaveMessage('¡Guardado con éxito en el código del proyecto! Ya está listo para Netlify y todos los dispositivos.');
+      } else {
+        setCodeSaveMessage('Guardado localmente en este navegador.');
+      }
+    } catch {
+      setCodeSaveMessage('Guardado localmente en este navegador.');
+    } finally {
+      setIsSavingToCode(false);
+      setSavedSuccess(true);
+      setTimeout(() => {
+        setSavedSuccess(false);
+      }, 5000);
+    }
+  };
+
+  const handleSaveAll = () => {
+    handleSaveToCode();
+  };
+
+  const handleCopyBackup = () => {
+    const backupData = {
+      heroImage: tempHeroImage,
+      discountAmount: tempDiscount,
+      whatsappNumber: tempWhatsapp,
+      instagramHandle: tempInstagram,
+      products: editableProducts,
+    };
+    navigator.clipboard.writeText(JSON.stringify(backupData, null, 2));
+    setCopiedSuccess(true);
+    setTimeout(() => setCopiedSuccess(false), 2500);
+  };
+
+  const handleDownloadBackup = () => {
+    const backupData = {
+      heroImage: tempHeroImage,
+      discountAmount: tempDiscount,
+      whatsappNumber: tempWhatsapp,
+      instagramHandle: tempInstagram,
+      products: editableProducts,
+    };
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `maison-catamarca-catalogo-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleResetToDefaults = () => {
     if (confirm('¿Deseas restaurar los precios y fotos originales de fábrica?')) {
-      const defaultHero = '/images/hero_maison_cherry_1791472687984.jpg';
+      const defaultHero = DEFAULT_HERO_IMAGE;
       setEditableProducts(DEFAULT_PRODUCTS);
       setTempHeroImage(defaultHero);
       setTempDiscount(10000);
@@ -272,7 +356,16 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
           </div>
         ) : (
           /* Main Admin Workspace */
-          <div className="flex-1 overflow-y-auto flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-neutral-200">
+          <div className="flex-1 overflow-y-auto flex flex-col">
+            <div className="bg-amber-50/90 border-b border-amber-200/80 px-6 py-2.5 flex items-center justify-between text-xs text-amber-900">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                <span>
+                  <strong>Configuración en preview:</strong> Para que tus fotos y precios se guarden fijos en el código (para Netlify y todos los dispositivos), hacé clic en <strong>'Guardar como Versión Definitiva'</strong> abajo a la derecha.
+                </span>
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-neutral-200">
             {/* Sidebar / Combos Switcher & Store Settings */}
             <div className="lg:w-72 p-5 bg-neutral-50/70 space-y-6">
               {/* Hero Banner Section */}
@@ -733,37 +826,68 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               ) : null}
             </div>
           </div>
+          </div>
         )}
 
         {/* Footer Actions */}
         {isAuthenticated && (
-          <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="text-xs text-neutral-500">
-              {savedSuccess ? (
-                <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
-                  <Check className="w-4 h-4" />
-                  ¡Cambios guardados con éxito en la tienda!
-                </span>
-              ) : (
-                <span>Los cambios se reflejarán inmediatamente en la tienda y en WhatsApp.</span>
-              )}
-            </div>
+          <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex flex-col gap-3">
+            {codeSaveMessage && (
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{codeSaveMessage}</span>
+              </div>
+            )}
 
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <button
-                onClick={onClose}
-                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-neutral-300 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
-              >
-                Cerrar
-              </button>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handleCopyBackup}
+                  className="px-3 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-[11px] font-medium text-neutral-600 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Copiar estructura de datos al portapapeles"
+                >
+                  <Copy className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>{copiedSuccess ? '¡Copiado!' : 'Copiar JSON'}</span>
+                </button>
 
-              <button
-                onClick={handleSaveAll}
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#c9182b] hover:bg-[#a91222] text-white text-xs font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
-              >
-                <Save className="w-4 h-4" />
-                <span>Guardar Cambios</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadBackup}
+                  className="px-3 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-[11px] font-medium text-neutral-600 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Descargar archivo .json con tus fotos y catálogo"
+                >
+                  <Download className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Descargar Archivo</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2.5 rounded-xl border border-neutral-300 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                >
+                  Cerrar
+                </button>
+
+                <button
+                  onClick={handleSaveToCode}
+                  disabled={isSavingToCode}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#c9182b] hover:bg-[#a91222] disabled:opacity-60 text-white text-xs font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
+                >
+                  {isSavingToCode ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Guardando en Código...</span>
+                    </>
+                  ) : (
+                    <>
+                      <HardDriveDownload className="w-4 h-4" />
+                      <span>Guardar como Versión Definitiva (Código / Netlify)</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         )}

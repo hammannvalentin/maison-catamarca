@@ -10,6 +10,7 @@ import {
   INAUGURATION_DISCOUNT_AMOUNT as DEFAULT_DISCOUNT,
   STORE_WHATSAPP_NUMBER as DEFAULT_WHATSAPP,
   STORE_INSTAGRAM as DEFAULT_INSTAGRAM,
+  DEFAULT_HERO_IMAGE,
 } from './data/products';
 import { getStoredItem, setStoredItem } from './utils/storage';
 import { Navbar } from './components/Navbar';
@@ -23,8 +24,6 @@ import { CartDrawer } from './components/CartDrawer';
 import { SearchModal } from './components/SearchModal';
 import { MobileStickyBar } from './components/MobileStickyBar';
 import { AdminPanelModal } from './components/AdminPanelModal';
-
-const DEFAULT_HERO_IMAGE = '/images/hero_maison_cherry_1791472687984.jpg';
 
 export default function App() {
   // Persistent Products
