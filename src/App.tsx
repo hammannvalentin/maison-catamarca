@@ -11,6 +11,7 @@ import {
   STORE_WHATSAPP_NUMBER as DEFAULT_WHATSAPP,
   STORE_INSTAGRAM as DEFAULT_INSTAGRAM,
 } from './data/products';
+import { getStoredItem, setStoredItem } from './utils/storage';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { PromoBanner } from './components/PromoBanner';
@@ -23,6 +24,8 @@ import { SearchModal } from './components/SearchModal';
 import { MobileStickyBar } from './components/MobileStickyBar';
 import { AdminPanelModal } from './components/AdminPanelModal';
 
+const DEFAULT_HERO_IMAGE = '/images/hero_maison_cherry_1791472687984.jpg';
+
 export default function App() {
   // Persistent Products
   const [products, setProducts] = useState<Product[]>(() => {
@@ -31,6 +34,16 @@ export default function App() {
       return saved ? JSON.parse(saved) : DEFAULT_PRODUCTS;
     } catch {
       return DEFAULT_PRODUCTS;
+    }
+  });
+
+  // Persistent Hero Image
+  const [heroImage, setHeroImage] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('maison_cherry_hero_image');
+      return saved ? JSON.parse(saved) : DEFAULT_HERO_IMAGE;
+    } catch {
+      return DEFAULT_HERO_IMAGE;
     }
   });
 
@@ -80,23 +93,29 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
 
-  // Sync cart to localStorage
+  // Asynchronously hydrate any large stored product images from IndexedDB
   useEffect(() => {
-    try {
-      localStorage.setItem('maison_cherry_cart', JSON.stringify(cartItems));
-    } catch (e) {
-      console.error('Error saving cart:', e);
-    }
+    getStoredItem<Product[]>('maison_cherry_products', DEFAULT_PRODUCTS).then((stored) => {
+      if (stored && Array.isArray(stored) && stored.length > 0) {
+        setProducts(stored);
+      }
+    });
+    getStoredItem<string>('maison_cherry_hero_image', DEFAULT_HERO_IMAGE).then((storedHero) => {
+      if (storedHero) {
+        setHeroImage(storedHero);
+      }
+    });
+  }, []);
+
+  // Sync cart to storage
+  useEffect(() => {
+    setStoredItem('maison_cherry_cart', cartItems);
   }, [cartItems]);
 
-  // Sync products to localStorage
+  // Sync products
   const handleUpdateProducts = (newProducts: Product[]) => {
     setProducts(newProducts);
-    try {
-      localStorage.setItem('maison_cherry_products', JSON.stringify(newProducts));
-    } catch (e) {
-      console.error('Error saving products:', e);
-    }
+    setStoredItem('maison_cherry_products', newProducts);
     // Update active modal product if currently open
     if (selectedProduct) {
       const updatedSelected = newProducts.find((p) => p.id === selectedProduct.id);
@@ -104,31 +123,24 @@ export default function App() {
     }
   };
 
+  const handleUpdateHeroImage = (newHeroImage: string) => {
+    setHeroImage(newHeroImage);
+    setStoredItem('maison_cherry_hero_image', newHeroImage);
+  };
+
   const handleUpdateDiscount = (amount: number) => {
     setDiscountAmount(amount);
-    try {
-      localStorage.setItem('maison_cherry_discount', String(amount));
-    } catch (e) {
-      console.error('Error saving discount:', e);
-    }
+    setStoredItem('maison_cherry_discount', amount);
   };
 
   const handleUpdateWhatsapp = (num: string) => {
     setWhatsappNumber(num);
-    try {
-      localStorage.setItem('maison_cherry_whatsapp', num);
-    } catch (e) {
-      console.error('Error saving whatsapp:', e);
-    }
+    setStoredItem('maison_cherry_whatsapp', num);
   };
 
   const handleUpdateInstagram = (handle: string) => {
     setInstagramHandle(handle);
-    try {
-      localStorage.setItem('maison_cherry_instagram', handle);
-    } catch (e) {
-      console.error('Error saving instagram:', e);
-    }
+    setStoredItem('maison_cherry_instagram', handle);
   };
 
   // Cart operations
@@ -212,6 +224,8 @@ export default function App() {
         <Hero
           onExplore={() => scrollToSection('combos')}
           onSelectCombo={handleSelectComboFromHero}
+          products={products}
+          heroImage={heroImage}
         />
 
         {/* Huge Inauguration Banner */}
@@ -283,6 +297,8 @@ export default function App() {
         onClose={() => setIsAdminOpen(false)}
         products={products}
         onUpdateProducts={handleUpdateProducts}
+        heroImage={heroImage}
+        onUpdateHeroImage={handleUpdateHeroImage}
         discountAmount={discountAmount}
         onUpdateDiscount={handleUpdateDiscount}
         whatsappNumber={whatsappNumber}

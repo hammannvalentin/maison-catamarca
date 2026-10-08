@@ -23,6 +23,8 @@ interface AdminPanelModalProps {
   onClose: () => void;
   products: Product[];
   onUpdateProducts: (newProducts: Product[]) => void;
+  heroImage: string;
+  onUpdateHeroImage: (image: string) => void;
   discountAmount: number;
   onUpdateDiscount: (amount: number) => void;
   whatsappNumber: string;
@@ -36,6 +38,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   onClose,
   products,
   onUpdateProducts,
+  heroImage,
+  onUpdateHeroImage,
   discountAmount,
   onUpdateDiscount,
   whatsappNumber,
@@ -48,8 +52,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [authError, setAuthError] = useState(false);
 
   // Local editable state
+  const [activeTab, setActiveTab] = useState<'combo' | 'hero'>('combo');
   const [editableProducts, setEditableProducts] = useState<Product[]>(products);
   const [selectedProductId, setSelectedProductId] = useState<string>(products[0]?.id || 'cherry-classic');
+  const [tempHeroImage, setTempHeroImage] = useState<string>(heroImage);
   const [tempDiscount, setTempDiscount] = useState<number>(discountAmount);
   const [tempWhatsapp, setTempWhatsapp] = useState<string>(whatsappNumber);
   const [tempInstagram, setTempInstagram] = useState<string>(instagramHandle);
@@ -60,12 +66,13 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   React.useEffect(() => {
     if (isOpen) {
       setEditableProducts(products);
+      setTempHeroImage(heroImage);
       setTempDiscount(discountAmount);
       setTempWhatsapp(whatsappNumber);
       setTempInstagram(instagramHandle);
       setSavedSuccess(false);
     }
-  }, [isOpen, products, discountAmount, whatsappNumber, instagramHandle]);
+  }, [isOpen, products, heroImage, discountAmount, whatsappNumber, instagramHandle]);
 
   if (!isOpen) return null;
 
@@ -109,15 +116,20 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     );
   };
 
-  const compressImage = (dataUrl: string, maxWidth = 1000, quality = 0.75): Promise<string> => {
+  const compressImage = (dataUrl: string, maxDim = 850, quality = 0.72): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
         let width = img.width;
         let height = img.height;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
         }
         const canvas = document.createElement('canvas');
         canvas.width = width;
@@ -155,22 +167,41 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     reader.readAsDataURL(file);
   };
 
+  const handleHeroFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const raw = event.target?.result as string;
+      if (raw) {
+        const compressed = await compressImage(raw, 950, 0.75);
+        setTempHeroImage(compressed);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSaveAll = () => {
     onUpdateProducts(editableProducts);
+    onUpdateHeroImage(tempHeroImage);
     onUpdateDiscount(tempDiscount);
     onUpdateWhatsapp(tempWhatsapp);
     onUpdateInstagram(tempInstagram);
     setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
+    setTimeout(() => setSavedSuccess(false), 3000);
   };
 
   const handleResetToDefaults = () => {
     if (confirm('¿Deseas restaurar los precios y fotos originales de fábrica?')) {
+      const defaultHero = '/images/hero_maison_cherry_1791472687984.jpg';
       setEditableProducts(DEFAULT_PRODUCTS);
+      setTempHeroImage(defaultHero);
       setTempDiscount(10000);
       setTempWhatsapp('543834765670');
       setTempInstagram('maisoncatamarca');
       onUpdateProducts(DEFAULT_PRODUCTS);
+      onUpdateHeroImage(defaultHero);
       onUpdateDiscount(10000);
       onUpdateWhatsapp('543834765670');
       onUpdateInstagram('maisoncatamarca');
@@ -244,6 +275,36 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
           <div className="flex-1 overflow-y-auto flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-neutral-200">
             {/* Sidebar / Combos Switcher & Store Settings */}
             <div className="lg:w-72 p-5 bg-neutral-50/70 space-y-6">
+              {/* Hero Banner Section */}
+              <div>
+                <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-400 block mb-2">
+                  Portada de la Tienda
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('hero')}
+                  className={`w-full p-3 rounded-2xl text-left border transition-all flex items-center gap-3 cursor-pointer ${
+                    activeTab === 'hero'
+                      ? 'bg-white border-neutral-900 shadow-sm ring-1 ring-neutral-900'
+                      : 'bg-white/80 border-neutral-200 hover:bg-white text-neutral-600'
+                  }`}
+                >
+                  <img
+                    src={tempHeroImage || '/images/hero_maison_cherry_1791472687984.jpg'}
+                    alt="Portada Hero"
+                    className="w-10 h-10 rounded-xl object-cover border border-neutral-200 shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-serif font-bold text-neutral-900 truncate">
+                      Foto Hero Principal
+                    </p>
+                    <p className="text-[11px] text-neutral-500">
+                      Portada de bienvenida
+                    </p>
+                  </div>
+                </button>
+              </div>
+
               <div>
                 <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-400 block mb-2.5">
                   Seleccionar Combo para Editar
@@ -252,9 +313,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   {editableProducts.map((p) => (
                     <button
                       key={p.id}
-                      onClick={() => setSelectedProductId(p.id)}
+                      onClick={() => {
+                        setSelectedProductId(p.id);
+                        setActiveTab('combo');
+                      }}
                       className={`w-full p-3 rounded-2xl text-left border transition-all flex items-center gap-3 cursor-pointer ${
-                        selectedProductId === p.id
+                        activeTab === 'combo' && selectedProductId === p.id
                           ? 'bg-white border-neutral-900 shadow-sm ring-1 ring-neutral-900'
                           : 'bg-white/80 border-neutral-200 hover:bg-white text-neutral-600'
                       }`}
@@ -339,9 +403,107 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               </button>
             </div>
 
-            {/* Main Form for Selected Combo */}
+            {/* Main Form for Selected Combo or Hero */}
             <div className="flex-1 p-6 overflow-y-auto space-y-6">
-              {currentProduct && (
+              {activeTab === 'hero' ? (
+                /* Hero Image Editor */
+                <div className="space-y-6">
+                  <div className="pb-3 border-b border-neutral-200">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#c9182b]">
+                      Portada de la Tienda
+                    </span>
+                    <h3 className="text-xl font-serif font-bold text-neutral-900">
+                      Foto Hero Principal (Bienvenida)
+                    </h3>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Esta es la imagen principal de gran impacto que ven los clientes ni bien ingresan al sitio.
+                    </p>
+                  </div>
+
+                  {/* Hero Live Preview */}
+                  <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-4">
+                    <span className="text-xs font-bold text-neutral-800 block">
+                      Vista Previa de la Portada
+                    </span>
+
+                    <div className="relative aspect-[16/10] sm:aspect-[16/9] max-w-xl mx-auto rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-300 shadow-sm">
+                      <img
+                        src={tempHeroImage || '/images/hero_maison_cherry_1791472687984.jpg'}
+                        alt="Vista previa Portada Hero"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute bottom-3 left-3 right-3 p-2.5 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-between text-xs">
+                        <span className="font-semibold text-neutral-900">Maison Cherry Catamarca</span>
+                        <span className="text-[10px] font-bold text-[#c9182b] uppercase">Concept Store</span>
+                      </div>
+                    </div>
+
+                    {/* Upload Controls for Hero */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                      <label className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-semibold cursor-pointer transition-all active:scale-[0.98]">
+                        <Upload className="w-4 h-4" />
+                        <span>Subir nueva foto de portada</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleHeroFileUpload}
+                          className="hidden"
+                        />
+                      </label>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setTempHeroImage('/images/hero_maison_cherry_1791472687984.jpg')
+                        }
+                        className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border border-neutral-300 hover:border-neutral-900 text-neutral-700 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5 text-neutral-500" />
+                        <span>Restaurar foto original</span>
+                      </button>
+                    </div>
+
+                    {/* Hero URL input */}
+                    <div>
+                      <label className="block text-[11px] font-medium text-neutral-600 mb-1">
+                        O ingresar URL directa de la imagen:
+                      </label>
+                      <input
+                        type="text"
+                        value={tempHeroImage}
+                        onChange={(e) => setTempHeroImage(e.target.value)}
+                        placeholder="https://... o /images/..."
+                        className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900 font-mono"
+                      />
+                    </div>
+
+                    {/* Quick presets from combos */}
+                    <div className="pt-3 border-t border-neutral-200">
+                      <span className="text-[11px] font-semibold text-neutral-500 block mb-2">
+                        O elegir la foto de alguno de los combos:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {editableProducts.map((p) => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => setTempHeroImage(p.image)}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 bg-white hover:border-neutral-900 text-[11px] font-medium text-neutral-700 transition-colors cursor-pointer"
+                          >
+                            <img
+                              src={p.image}
+                              alt={p.name}
+                              className="w-5 h-5 rounded object-cover"
+                            />
+                            <span>Usar {p.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : currentProduct ? (
                 <>
                   <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
                     <div>
@@ -568,7 +730,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                     </div>
                   </div>
                 </>
-              )}
+              ) : null}
             </div>
           </div>
         )}

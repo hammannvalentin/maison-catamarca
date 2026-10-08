@@ -1,13 +1,27 @@
 import React from 'react';
 import { ArrowDown, Sparkles } from 'lucide-react';
 import { MaisonCherryLogo } from './MaisonCherryLogo';
+import { Product } from '../types';
 
 interface HeroProps {
   onExplore: () => void;
   onSelectCombo: (comboId: string) => void;
+  products?: Product[];
+  heroImage?: string;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onExplore, onSelectCombo }) => {
+export const Hero: React.FC<HeroProps> = ({
+  onExplore,
+  onSelectCombo,
+  products = [],
+  heroImage,
+}) => {
+  const classic = products.find((p) => p.id === 'cherry-classic');
+  const perla = products.find((p) => p.id === 'cherry-perla');
+  const friends = products.find((p) => p.id === 'friends');
+
+  const displayHeroImage = heroImage || '/images/hero_maison_cherry_1791472687984.jpg';
+
   return (
     <section id="hero" className="relative w-full pt-6 pb-12 sm:pb-16 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -50,7 +64,9 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onSelectCombo }) => {
                   <p className="text-xs font-semibold text-neutral-900 group-hover:text-[#c9182b] transition-colors">
                     Cherry Clasic
                   </p>
-                  <p className="text-[11px] text-neutral-500 font-mono tabular-nums">$32.200</p>
+                  <p className="text-[11px] text-neutral-500 font-mono tabular-nums">
+                    ${(classic?.price ?? 32200).toLocaleString('es-AR')}
+                  </p>
                 </button>
 
                 <button
@@ -60,7 +76,9 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onSelectCombo }) => {
                   <p className="text-xs font-semibold text-neutral-900 group-hover:text-[#c9182b] transition-colors">
                     Cherry Perla
                   </p>
-                  <p className="text-[11px] text-neutral-500 font-mono tabular-nums">$42.200</p>
+                  <p className="text-[11px] text-neutral-500 font-mono tabular-nums">
+                    ${(perla?.price ?? 42200).toLocaleString('es-AR')}
+                  </p>
                 </button>
 
                 <button
@@ -70,7 +88,9 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onSelectCombo }) => {
                   <p className="text-xs font-semibold text-neutral-900 group-hover:text-[#c9182b] transition-colors">
                     Friends Pack
                   </p>
-                  <p className="text-[11px] text-neutral-500 font-mono tabular-nums">$72.200</p>
+                  <p className="text-[11px] text-neutral-500 font-mono tabular-nums">
+                    ${(friends?.price ?? 72200).toLocaleString('es-AR')}
+                  </p>
                 </button>
               </div>
             </div>
@@ -96,7 +116,7 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onSelectCombo }) => {
           <div className="lg:col-span-6 relative">
             <div className="relative aspect-[4/3] sm:aspect-[16/11] rounded-2xl overflow-hidden bg-neutral-100 shadow-inner group">
               <img
-                src="/images/hero_maison_cherry_1791472687984.jpg"
+                src={displayHeroImage}
                 alt="Maison Cherry Joyería Catamarca"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 referrerPolicy="no-referrer"
