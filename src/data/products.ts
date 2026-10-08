@@ -3,8 +3,8 @@ import { Product } from '../types';
 export const INAUGURATION_DISCOUNT_AMOUNT = 10000;
 export const STORE_WHATSAPP_NUMBER = '543834765670';
 export const STORE_INSTAGRAM = 'maisoncatamarca';
-export const DEFAULT_HERO_IMAGE = "/images/hero_1791482515973_djn4.jpg";
-export const CATALOG_VERSION = "2026_10_08_v2_photos";
+export const DEFAULT_HERO_IMAGE = "/images/todos_juntos.jfif";
+export const CATALOG_VERSION = "2026_10_08_v3_user_images";
 
 export const CATEGORIES = [
   { id: 'all', label: 'Todos los Combos' },
@@ -21,11 +21,11 @@ export const PRODUCTS: Product[] = [
     "originalPrice": 32200,
     "category": "combos",
     "categoryLabel": "Combo 01",
-    "image": "/images/prod_cherry-classic_main_1791482515974_wlux.jpg",
+    "image": "/images/c1principal.png",
     "secondaryImages": [
-      "/images/prod_cherry-classic_sec_0_1791482515974_cxsm.jpg",
-      "/images/prod_cherry-classic_sec_1_1791482515974_l5gw.jpg",
-      "/images/prod_cherry-classic_sec_2_1791482515975_kbj9.jpg"
+      "/images/c1secundaria_1.png",
+      "/images/c1secundaria_2.png",
+      "/images/c1secundaria_3.png"
     ],
     "description": "El conjunto clásico icónico de la marca. Incluye el delicado collar dorado con dije de doble cereza esmaltada en rojo rubí y hojitas verdes, acompañado de sus aros colgantes a juego con engarce superior de circonio brillante.",
     "includes": [
@@ -45,11 +45,10 @@ export const PRODUCTS: Product[] = [
     "originalPrice": 42200,
     "category": "combos",
     "categoryLabel": "Combo 02",
-    "image": "/images/prod_cherry-perla_main_1791482515975_parh.jpg",
+    "image": "/images/cpprincipal.jpg",
     "secondaryImages": [
-      "/images/prod_cherry-perla_sec_0_1791482515975_aap5.jpg",
-      "/images/prod_cherry-perla_sec_1_1791482515976_ayst.jpg",
-      "/images/prod_cherry-perla_sec_2_1791482515976_fngm.jpg"
+      "/images/cpsecundaria_1.png",
+      "/images/cpsecundaria_2.png"
     ],
     "description": "Exclusiva gargantilla de perlas pulidas de brillo sedoso con colgante central de cerezas dobles en cristal facetado color rubí y hojitas de circonio verde olivo. Incluye aros de cereza de cristal facetado más 2 pares adicionales de aritos solitarios de perla y punto de luz (3 pares de aros en total).",
     "includes": [
@@ -70,15 +69,15 @@ export const PRODUCTS: Product[] = [
     "originalPrice": 72200,
     "category": "besties",
     "categoryLabel": "Combo 03",
-    "image": "/images/prod_friends_main_1791482515977_evby.jpg",
+    "image": "/images/todos_juntos.jfif",
     "secondaryImages": [
-      "/images/prod_friends_sec_0_1791482515977_6ymw.jpg",
-      "/images/prod_friends_sec_1_1791482515977_ieo4.jpg",
-      "/images/prod_friends_sec_2_1791482515977_mu2d.jpg",
-      "/images/prod_friends_sec_3_1791482515978_hk3d.jpg",
-      "/images/prod_friends_sec_4_1791482515978_048z.jpg",
-      "/images/prod_friends_sec_5_1791482515978_o5hw.jpg",
-      "/images/prod_friends_sec_6_1791482515978_8eyi.jpg"
+      "/images/cf1.png",
+      "/images/cf2.png",
+      "/images/cf3.png",
+      "/images/cf4.png",
+      "/images/cf5.png",
+      "/images/cf6.png",
+      "/images/cf7.png"
     ],
     "description": "El conjunto completo pensado para compartir con tu mejor amiga o hermana. Incluye el collar compartido magnético Sol y Luna con cristales pavé (oro y plata), el collar con dije de corazón esmaltado con rosas, el choker negro con esfera cereza traslúcida, aros Cat in a Cup, aros gatito Luna, aros gatito blanco celestial y argollitas butterfly bordó.",
     "includes": [
