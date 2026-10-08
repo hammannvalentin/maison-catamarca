@@ -11,6 +11,7 @@ import {
   STORE_WHATSAPP_NUMBER as DEFAULT_WHATSAPP,
   STORE_INSTAGRAM as DEFAULT_INSTAGRAM,
   DEFAULT_HERO_IMAGE,
+  CATALOG_VERSION,
 } from './data/products';
 import { getStoredItem, setStoredItem } from './utils/storage';
 import { Navbar } from './components/Navbar';
@@ -26,8 +27,18 @@ import { MobileStickyBar } from './components/MobileStickyBar';
 import { AdminPanelModal } from './components/AdminPanelModal';
 
 export default function App() {
+  // Check if catalog version is current
+  const isCurrentVersion = (() => {
+    try {
+      return localStorage.getItem('maison_cherry_catalog_version') === CATALOG_VERSION;
+    } catch {
+      return false;
+    }
+  })();
+
   // Persistent Products
   const [products, setProducts] = useState<Product[]>(() => {
+    if (!isCurrentVersion) return DEFAULT_PRODUCTS;
     try {
       const saved = localStorage.getItem('maison_cherry_products');
       return saved ? JSON.parse(saved) : DEFAULT_PRODUCTS;
@@ -38,6 +49,7 @@ export default function App() {
 
   // Persistent Hero Image
   const [heroImage, setHeroImage] = useState<string>(() => {
+    if (!isCurrentVersion) return DEFAULT_HERO_IMAGE;
     try {
       const saved = localStorage.getItem('maison_cherry_hero_image');
       return saved ? JSON.parse(saved) : DEFAULT_HERO_IMAGE;
@@ -92,8 +104,23 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
 
-  // Asynchronously hydrate any large stored product images from IndexedDB
+  // Hydrate or initialize current version
   useEffect(() => {
+    try {
+      const storedVersion = localStorage.getItem('maison_cherry_catalog_version');
+      if (storedVersion !== CATALOG_VERSION) {
+        // Automatically sync to newly deployed catalog
+        localStorage.setItem('maison_cherry_catalog_version', CATALOG_VERSION);
+        setStoredItem('maison_cherry_products', DEFAULT_PRODUCTS);
+        setStoredItem('maison_cherry_hero_image', DEFAULT_HERO_IMAGE);
+        setProducts(DEFAULT_PRODUCTS);
+        setHeroImage(DEFAULT_HERO_IMAGE);
+        return;
+      }
+    } catch {
+      // Ignore localStorage read errors
+    }
+
     getStoredItem<Product[]>('maison_cherry_products', DEFAULT_PRODUCTS).then((stored) => {
       if (stored && Array.isArray(stored) && stored.length > 0) {
         setProducts(stored);

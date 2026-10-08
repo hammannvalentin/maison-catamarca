@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowDown, Sparkles } from 'lucide-react';
 import { MaisonCherryLogo } from './MaisonCherryLogo';
 import { Product } from '../types';
+import { DEFAULT_HERO_IMAGE } from '../data/products';
 
 interface HeroProps {
   onExplore: () => void;
@@ -20,7 +21,7 @@ export const Hero: React.FC<HeroProps> = ({
   const perla = products.find((p) => p.id === 'cherry-perla');
   const friends = products.find((p) => p.id === 'friends');
 
-  const displayHeroImage = heroImage || '/images/hero_maison_cherry_1791472687984.jpg';
+  const displayHeroImage = heroImage || DEFAULT_HERO_IMAGE;
 
   return (
     <section id="hero" className="relative w-full pt-6 pb-12 sm:pb-16 overflow-hidden">

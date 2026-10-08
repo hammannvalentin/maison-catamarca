@@ -4,6 +4,7 @@ export const INAUGURATION_DISCOUNT_AMOUNT = 10000;
 export const STORE_WHATSAPP_NUMBER = '543834765670';
 export const STORE_INSTAGRAM = 'maisoncatamarca';
 export const DEFAULT_HERO_IMAGE = "/images/hero_1791482515973_djn4.jpg";
+export const CATALOG_VERSION = "2026_10_08_v2_photos";
 
 export const CATEGORIES = [
   { id: 'all', label: 'Todos los Combos' },

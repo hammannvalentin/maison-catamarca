@@ -383,7 +383,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   }`}
                 >
                   <img
-                    src={tempHeroImage || '/images/hero_maison_cherry_1791472687984.jpg'}
+                    src={tempHeroImage || DEFAULT_HERO_IMAGE}
                     alt="Portada Hero"
                     className="w-10 h-10 rounded-xl object-cover border border-neutral-200 shrink-0"
                   />
@@ -521,7 +521,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
                     <div className="relative aspect-[16/10] sm:aspect-[16/9] max-w-xl mx-auto rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-300 shadow-sm">
                       <img
-                        src={tempHeroImage || '/images/hero_maison_cherry_1791472687984.jpg'}
+                        src={tempHeroImage || DEFAULT_HERO_IMAGE}
                         alt="Vista previa Portada Hero"
                         className="w-full h-full object-cover"
                       />
@@ -548,7 +548,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       <button
                         type="button"
                         onClick={() =>
-                          setTempHeroImage('/images/hero_maison_cherry_1791472687984.jpg')
+                          setTempHeroImage(DEFAULT_HERO_IMAGE)
                         }
                         className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border border-neutral-300 hover:border-neutral-900 text-neutral-700 text-xs font-semibold rounded-xl transition-all cursor-pointer"
                       >
