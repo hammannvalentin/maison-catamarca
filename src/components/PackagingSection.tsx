@@ -10,7 +10,7 @@ export const PackagingSection: React.FC = () => {
           <div className="lg:col-span-6">
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-lg border border-neutral-200/80 bg-white">
               <img
-                src="/src/assets/images/maison_packaging_1791472748362.jpg"
+                src="/images/maison_packaging_1791472748362.jpg"
                 alt="Packaging artesanal Maison Cherry Catamarca"
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"

@@ -96,7 +96,7 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onSelectCombo }) => {
           <div className="lg:col-span-6 relative">
             <div className="relative aspect-[4/3] sm:aspect-[16/11] rounded-2xl overflow-hidden bg-neutral-100 shadow-inner group">
               <img
-                src="/src/assets/images/hero_maison_cherry_1791472687984.jpg"
+                src="/images/hero_maison_cherry_1791472687984.jpg"
                 alt="Maison Cherry Joyería Catamarca"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 referrerPolicy="no-referrer"

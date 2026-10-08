@@ -19,12 +19,12 @@ export const PRODUCTS: Product[] = [
     originalPrice: 42200,
     category: 'combos',
     categoryLabel: 'Combo 01',
-    image: '/src/assets/images/cherry_seda_1791475794858.jpg',
+    image: '/images/cherry_seda_1791475794858.jpg',
     secondaryImages: [
-      '/src/assets/images/cherry_hand_1791475805920.jpg',
-      '/src/assets/images/cherry_macro_stone_1791475867136.jpg',
-      '/src/assets/images/cherry_cuello_1791475817074.jpg',
-      '/src/assets/images/cherry_golden_morning_1791475826269.jpg',
+      '/images/cherry_hand_1791475805920.jpg',
+      '/images/cherry_macro_stone_1791475867136.jpg',
+      '/images/cherry_cuello_1791475817074.jpg',
+      '/images/cherry_golden_morning_1791475826269.jpg',
     ],
     description:
       'El conjunto clásico icónico de la marca. Incluye el delicado collar dorado con dije de doble cereza esmaltada en rojo rubí y hojitas verdes, acompañado de sus aros colgantes a juego con engarce superior de circonio brillante.',
@@ -45,10 +45,10 @@ export const PRODUCTS: Product[] = [
     originalPrice: 52200,
     category: 'combos',
     categoryLabel: 'Combo 02',
-    image: '/src/assets/images/combo_cherry_pearl_1791472722439.jpg',
+    image: '/images/combo_cherry_pearl_1791472722439.jpg',
     secondaryImages: [
-      '/src/assets/images/pearl_plate_1791474363816.jpg',
-      '/src/assets/images/hero_maison_cherry_1791472687984.jpg',
+      '/images/pearl_plate_1791474363816.jpg',
+      '/images/hero_maison_cherry_1791472687984.jpg',
     ],
     description:
       'Exclusiva gargantilla de perlas pulidas de brillo sedoso con colgante central de cerezas dobles en cristal facetado color rubí y hojitas de circonio verde olivo. Incluye aros de cereza de cristal facetado más 2 pares adicionales de aritos solitarios de perla y punto de luz (3 pares de aros en total).',
@@ -70,9 +70,9 @@ export const PRODUCTS: Product[] = [
     originalPrice: 82200,
     category: 'besties',
     categoryLabel: 'Combo 03',
-    image: '/src/assets/images/combo_friends_pack_1791472735864.jpg',
+    image: '/images/combo_friends_pack_1791472735864.jpg',
     secondaryImages: [
-      '/src/assets/images/friends_details_1791474374036.jpg',
+      '/images/friends_details_1791474374036.jpg',
     ],
     description:
       'El conjunto completo pensado para compartir con tu mejor amiga o hermana. Incluye el collar compartido magnético Sol y Luna con cristales pavé (oro y plata), el collar con dije de corazón esmaltado con rosas, el choker negro con esfera cereza traslúcida, aros Cat in a Cup, aros gatito Luna, aros gatito blanco celestial y argollitas butterfly bordó.',
